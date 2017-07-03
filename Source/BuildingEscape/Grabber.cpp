@@ -5,6 +5,9 @@
 // Needed for GetWorld()
 #include "Engine/World.h"
 
+// Needed for input component
+#include "Components/InputComponent.h"
+
 // Needed for DrawDebugLine()
 #include "DrawDebugHelpers.h"
 #include "GameFramework/PlayerController.h" 
@@ -27,7 +30,26 @@ void UGrabber::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
+	/// Look for attached physics handle
+	PhysicsHandle = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
+	if (!PhysicsHandle)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Unable to find physics handle for %s"), *GetOwner()->GetName());
+	}
+
+	/// Look for attached input component (only appears at run-time)
+	Input = GetOwner()->FindComponentByClass<UInputComponent>();
+	if (!Input)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Unable to find input component for %s"), *GetOwner()->GetName());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Found input component for %s"), *GetOwner()->GetName());
+
+		/// Bind the input axis
+		Input->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
+	}
 }
 
 
@@ -63,5 +85,11 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Hit %s"), *LineTraceHit.GetActor()->GetName());
 	}
+}
+
+void UGrabber::Grab()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Grab pressed"), *GetOwner()->GetName());
+
 }
 

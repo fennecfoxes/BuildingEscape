@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "PhysicsEngine/PhysicsHandleComponent.h"
 #include "Components/ActorComponent.h"
 #include "Grabber.generated.h"
 
@@ -26,7 +27,11 @@ public:
 
 private:
 	// How far to reach to pick up object (cm from player)
-	UPROPERTY(EditAnywhere)
 	float GrabberReach = 100.0f;
 	
+	UPhysicsHandleComponent* PhysicsHandle = nullptr;
+	UInputComponent* Input = nullptr;
+
+	// Ray-cast and grab object within POV reach
+	void Grab();
 };

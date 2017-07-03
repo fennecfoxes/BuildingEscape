@@ -34,4 +34,16 @@ private:
 
 	// Ray-cast and grab object within POV reach
 	void Grab();
+
+	// Called when grab key is released
+	void Release();
+
+	// Called to find physics handle component
+	void FindPhysicsHandleComponent();
+
+	// Called to find (assumed) attached input component and setup
+	void FindInputComponent();
+
+	// Returns first object within POV reach
+	const FHitResult GetFirstPhysicsBodyWithinReach();
 };

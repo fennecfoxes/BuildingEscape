@@ -4,6 +4,9 @@
 
 // Needed for GetWorld()
 #include "Engine/World.h"
+
+// Needed for DrawDebugLine()
+#include "DrawDebugHelpers.h"
 #include "GameFramework/PlayerController.h" 
 
 
@@ -31,13 +34,20 @@ void UGrabber::BeginPlay()
 void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	
+	FVector PlayerViewPointLocation;
+	FVector LineTraceDirection;
+	FVector LineTraceEnd;
+	FRotator PlayerViewPointRotation;
 
 	// Get player view point
-	FVector PlayerViewPointLocation;
-	FRotator PlayerViewPointRotation;
 	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(PlayerViewPointLocation, PlayerViewPointRotation);
-	
-	UE_LOG(LogTemp, Warning, TEXT("Location at %s	Rotation at %s"), *PlayerViewPointLocation.ToString(), *PlayerViewPointRotation.ToString());
+	LineTraceDirection = PlayerViewPointRotation.Vector();
+	// UE_LOG(LogTemp, Warning, TEXT("Location at %s	Rotation at %s"), *PlayerViewPointLocation.ToString(), *PlayerViewPointRotation.ToString());
+
+	// Draw red trace to visualize reach
+	LineTraceEnd = PlayerViewPointLocation + (LineTraceDirection * GrabberReach);
+	DrawDebugLine(GetWorld(), PlayerViewPointLocation, LineTraceEnd, FColor(255, 0, 0), false, 0.0f, 0.0f, 1.0f);
 	
 	// Ray-cast out to reach distance
 

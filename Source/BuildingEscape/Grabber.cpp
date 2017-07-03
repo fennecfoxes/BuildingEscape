@@ -8,6 +8,8 @@
 // Needed for input component
 #include "Components/InputComponent.h"
 
+#include "Public/UObject/NameTypes.h"
+
 // Needed for DrawDebugLine()
 #include "DrawDebugHelpers.h"
 #include "GameFramework/PlayerController.h" 
@@ -69,13 +71,22 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	/// Line trace and see if we are within reach of any objects
-	GetFirstPhysicsBodyWithinReach();
+	FVector PlayerViewPointLocation;
+	FVector LineTraceDirection;
+	FVector LineTraceEnd;
+	FRotator PlayerViewPointRotation;
+
+	/// Get player view point
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(OUT PlayerViewPointLocation, OUT PlayerViewPointRotation);
+	LineTraceDirection = PlayerViewPointRotation.Vector();
+	LineTraceEnd = PlayerViewPointLocation + LineTraceDirection * GrabberReach;
 
 	/// If physics handle is attached, then move object pawn is holding
+	if (PhysicsHandle->GrabbedComponent)
+	{
+		PhysicsHandle->SetTargetLocation(LineTraceEnd);
+	}
 	
-	
-
 }
 
 // Ray-cast and grab object within POV reach
@@ -83,11 +94,16 @@ void UGrabber::Grab()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Grab pressed"));
 
-	/// TODO
-	/// Try to reach any actors with physics body collision channel set
+	/// Line trace and see if we are within reach of any objects
+	auto HitResult = GetFirstPhysicsBodyWithinReach();
+	auto ComponentToGrab = HitResult.GetComponent();
+	auto ActorHit = HitResult.GetActor();
 
-	/// If we hit good object, then attach physics handle
-
+	/// If we hit something, grab that component
+	if (ActorHit)
+	{
+		PhysicsHandle->GrabComponent(ComponentToGrab, NAME_None, ActorHit->GetActorLocation(), true);
+	}
 }
 
 // Called when grab key is released
@@ -95,8 +111,8 @@ void UGrabber::Release()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Grab released"));
 
-	/// TODO
 	/// Release physics handle
+	PhysicsHandle->ReleaseComponent();
 }
 
 const FHitResult UGrabber::GetFirstPhysicsBodyWithinReach()
@@ -129,6 +145,6 @@ const FHitResult UGrabber::GetFirstPhysicsBodyWithinReach()
 		UE_LOG(LogTemp, Warning, TEXT("Hit %s"), *LineTraceHit.GetActor()->GetName());
 	}
 
-	return FHitResult();
+	return FHitResult(LineTraceHit);
 }
 

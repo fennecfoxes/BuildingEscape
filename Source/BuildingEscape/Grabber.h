@@ -46,4 +46,10 @@ private:
 
 	// Returns first object within POV reach
 	const FHitResult GetFirstPhysicsBodyWithinReach();
+
+	// Get reach line end from player
+	FVector GetLineTraceEnd();
+
+	// Get reach line start from player
+	FVector GetLineTraceStart();
 };

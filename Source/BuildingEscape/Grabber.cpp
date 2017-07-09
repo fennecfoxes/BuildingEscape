@@ -33,6 +33,12 @@ void UGrabber::BeginPlay()
 	/// Find physics handle and input component
 	FindPhysicsHandleComponent();
 	FindInputComponent();
+
+	if (!Input)
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s: InputComponent not set"), *FString(__func__));
+		return;
+	}
 }
 
 // Called to find physics handle component
@@ -68,6 +74,12 @@ void UGrabber::FindInputComponent()
 void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	if (!PhysicsHandle)
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s: PhysicsHandle not set"), *FString(__func__));
+		return;
+	}
 
 	/// If physics handle is attached, then move object pawn is holding
 	if (PhysicsHandle->GrabbedComponent)
